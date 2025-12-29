@@ -1,0 +1,20 @@
+<h2>Home</h2>
+
+{% if user.is_authenticated %}
+    Logged in as {{ user.username }}
+    <br><br>
+
+    <!-- Link to your Person CRUD list -->
+    <a href="{% url 'person_list' %}">Manage Persons</a>
+    <br><br>
+
+    <a href="{% url 'logout' %}">Logout</a>
+
+{% else %}
+
+    <a href="{% url 'login' %}">Login</a>
+    <br><br>
+
+    <a href="{% url 'register' %}">Register</a>
+
+{% endif %}
