@@ -1,3 +1,5 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'EndProject/style.css' %}">
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,6 +7,21 @@
 </head>
 <body>
     <h1>All Tasks</h1>
+
+    <form method="GET" action="{% url 'tasks' %}">
+        <label for="status">סטטוס:</label>
+        <select name="status" id="status">
+            <option value="">--בחר--</option>
+            <option value="open">פתוחה</option>
+            <option value="in_progress">בתהליך</option>
+            <option value="completed">הושלמה</option>
+        </select>
+
+        <label for="employee_name">שם עובד:</label>
+        <input type="text" name="employee_name" id="employee_name" placeholder="חפש עובד"/>
+
+        <button type="submit">סנן</button>
+    </form>
 
     <a href="{% url 'task_create' %}">Add New Task</a>
 
@@ -20,6 +37,9 @@
             <td>{{ task.title }}</td>
             <td>{{ task.description }}</td>
             <td>{{ task.status }}</td>
+            {% if task.myDoner == "Process" and task.myDoner == user%}
+                <a href="{% url 'task_take' task.pk %}">Take Task</a>
+            {% endif %}
             <td>
                 {% if task.myDoner is none %}
                         {% if user.role == "worker" %}

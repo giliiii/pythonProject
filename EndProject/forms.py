@@ -30,20 +30,17 @@ class UserForm(forms.ModelForm):
 class TaskForm(forms.ModelForm):
     deadline = forms.DateTimeField(
         widget=forms.DateTimeInput(
-            attrs={'type': 'datetime-local'}  # חץ לבחירת תאריך ושעה
+            attrs={'type': 'datetime-local'}
         ),
         initial=(datetime.now() + timedelta(days=30)).strftime("%Y-%m-%dT%H:%M"))
-    myTeam = forms.ModelChoiceField(Team.objects.all())
-    myDoner = forms.ModelChoiceField(User.objects.all())
+    #myTeam = forms.ModelChoiceField(Team.objects.all())
+    #myDoner = forms.ModelChoiceField(User.objects.all())
     class Meta:
         model = Task
-        fields = "__all__"
+        fields = ["title","describe","deadline"]
         labels = {
             "title": "title",
             "describe": "describe",
-            "myTeam": "myTeam",
-            "status": "status",
-            "myDoner": "myDoner",
             "deadline": "deadline",
         }
         help_texts = {

@@ -15,7 +15,6 @@ from django.contrib.auth.decorators import login_required
 def register_view(request):
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
-        roles=["admin","worker"]
         if form.is_valid():
             user = form.save()
             login(request, user)  # auto-login after register
@@ -51,11 +50,12 @@ def logout_view(request):
 @transaction.atomic
 def task_create(request):
     if request.user.role != "admin":
-        return redirect("task_list")
+        return redirect("tasks")
 
     if request.method == "POST":
         form = TaskForm(request.POST)
         if form.is_valid():
+            form.myTeam=request.user.team
             form.save()
             return redirect('tasks')
     else:
@@ -90,7 +90,7 @@ def User_list(request):
 
 # Create your views here.
 def home(request):
-    return render(request, 'home.html', {'User': User})
+    return render(request, 'home.html', )
 
 def user_list(request):
     Users = User.objects.all()
@@ -98,8 +98,17 @@ def user_list(request):
 
 
 def tasks(request):
-    Tasks = Task.objects.all()
-    return render(request, "tasks/taskList.html")
+
+    user=request.user
+    tasks = Task.objects.filter(myTeam=user.team)
+    status = request.GET.get('status')
+    if status:
+        tasks = tasks.filter(status=status)
+
+    employee_name = request.GET.get('employee_name')
+    if employee_name:
+        tasks = tasks.filter(assigned_to__name__icontains=employee_name)
+    return render(request, "tasks/taskList.html",{'Tasks': tasks})
 
 
 @login_required
@@ -112,12 +121,12 @@ def task_update(request, pk):
             form = TaskForm(request.POST, instance=task)
             if form.is_valid():
                 form.save()
-                return redirect('task_list')
+                return redirect('tasks')
         else:
             form = TaskForm(instance=task)
         return render(request, 'tasks/crateTask.html', {'form': form})
     else:
-        return redirect('task_list')  # חסום משתמש שלא מורשה
+        return redirect('tasks')  # חסום משתמש שלא מורשה
 
 @login_required
 def task_delete(request, pk):
@@ -125,10 +134,10 @@ def task_delete(request, pk):
     if request.user.role == "admin" and task.myDoner is None:
         if request.method == "POST":
             task.delete()
-            return redirect('task_list')
+            return redirect('tasks')
         return render(request, 'tasks/deleteTask.html', {'task': task})
     else:
-        return redirect('taskList')
+        return redirect('tasks')
 
 @login_required
 def task_take(request, pk):
@@ -138,6 +147,13 @@ def task_take(request, pk):
         task.status="Process"
         task.save()
     return redirect('tasklist')
+
+@login_required
+def task_finish(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    if task.myDoner ==request.user and task.status == "Process":
+        task.status="Process"
+    return redirect('tasks')
 
 @login_required
 def chooseTeam(request):
