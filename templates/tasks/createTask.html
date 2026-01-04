@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if form.instance.pk %}Edit Task{% else %}Add Task{% endif %}</title>
+</head>
+<body>
+    {%if user.role == "admin" %}
+        <h1>{% if form.instance.pk %}Edit Task{% else %}Add Task{% endif %}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button>
+        </form>
+    {% else %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">get this task for me</button>
+        </form>
+    {% endif %}
+
+
+    <a href="{% url 'tasks' %}">Back to Task List</a>
+</body>
+</html>

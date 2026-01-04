@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from docutils.parsers.rst.directives.misc import Role
+
 from .models import User, Task,Team
-from .forms import UserForm, TaskForm, TeamForm
+from .forms import UserForm, TaskForm, TeamForm,CustomUserCreationForm,CustomAuthenticationForm,ChooseTeamForm
 #from django.http import Http404
 from django.db import transaction
 
@@ -12,83 +14,54 @@ from django.contrib.auth.decorators import login_required
 # REGISTER
 def register_view(request):
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
+        roles=["admin","worker"]
         if form.is_valid():
             user = form.save()
             login(request, user)  # auto-login after register
-            return redirect("home")
+            return redirect("chooseTeam")
     else:
-        form = UserCreationForm()
-    return render(request, "accounts/register.html", {"form": form})
+        form = CustomUserCreationForm()
+    return render(request, "users/register.html", {"form": form})
 
 
 # LOGIN
 def login_view(request):
     if request.method == "POST":
-        form = AuthenticationForm(request, data=request.POST)
+        form = CustomAuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
             return redirect("home")
     else:
-        form = AuthenticationForm()
-    return render(request, "accounts/login.html", {"form": form})
+        form = CustomAuthenticationForm()
+    return render(request, "users/login.html", {"form": form})
 
 
 # LOGOUT
 def logout_view(request):
     logout(request)
-    return redirect("login")
+    return redirect("home")
+
+
 
 
 
 @login_required
 @transaction.atomic
-def User_create(request):
+def task_create(request):
+    if request.user.role != "admin":
+        return redirect("task_list")
+
     if request.method == "POST":
-        formUser = UserForm(request.POST)
-        # formTask = TaskForm(request.POST)
-        if formUser.is_valid():
-            #1 - Save to User
-            newUser = formUser.save()
-            newUser.save()
-            #2 - Save to Task and connect tp User
-            # # Task = formTask.save(commit=False)
-            # Task.User = User
-            # Task.save()
-            #3 - Save the n:m relationship
-            # formTask.save_m2m()
-
-            return redirect('User_list')
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('tasks')
     else:
-        formUser = UserForm()
-        # formTask = TaskForm()
-    form = formUser  # combine them
-    return render(request, 'Users/User_form.html', {'form': form})
+        form = TaskForm()
 
-@login_required
-@transaction.atomic
-def Task_create(request):
-    if request.method == "POST":
-        formTask = TaskForm(request.POST)
-        # formTask = TaskForm(request.POST)
-        if formTask.is_valid():
-            #1 - Save to User
-            newTask = formTask.save()
-            newTask.save()
-            #2 - Save to Task and connect tp User
-            # # Task = formTask.save(commit=False)
-            # Task.User = User
-            # Task.save()
-            #3 - Save the n:m relationship
-            # formTask.save_m2m()
-
-            return redirect('Task_list')
-    else:
-        formTask = TaskForm()
-        # formTask = TaskForm()
-    form = formTask  # combine them
-    return render(request, 'Users/User_form.html', {'form': form})
+    return render(request, 'tasks/createTask.html', {'form': form})
 
 
 @login_required
@@ -112,45 +85,73 @@ def User_list(request):
     Users = User.objects.all()
     return render(request, 'Users/User_list.html', {'Users': Users})
 
-@login_required
-def Task_list(request):
-    Tasks = Task.objects.all()
-    return render(request, 'Users/User_list.html', {'tasks': Tasks})
-
-@login_required
-def User_update(request, tz):
-    User = get_object_or_404(User, pk=tz)
-
-    ##alternative code
-    #User = User.objects.filter(tz=tz).first()
-    #if not User:
-    #    raise Http404("User not found")
-
-    #syntax for get_object_or_404
-    #get_object_or_404(Model, pk=value)
-    #get_object_or_404(Model, field=value)
-    #get_object_or_404(Model, field__lookup=value)
-    #get_object_or_404(queryset, filter=value)
-
-    if request.method == "POST":
-        form = UserForm(request.POST, instance=User)
-        if form.is_valid():
-            form.save()
-            return redirect('User_list')
-    else:
-        form = UserForm(instance=User)
-
-    return render(request, 'Users/User_form.html', {'form': form})
 
 
-@login_required
-def User_delete(request, tz):
-    User = get_object_or_404(User, pk=tz)
-
-    if request.method == "POST":
-        User.delete()
-        return redirect('User_list')
-
-    return render(request, 'Users/User_confirm_delete.html', {'User': User})
 
 # Create your views here.
+def home(request):
+    return render(request, 'home.html', {'User': User})
+
+def user_list(request):
+    Users = User.objects.all()
+    return render(request, 'userList.html', {'User': User})
+
+
+def tasks(request):
+    Tasks = Task.objects.all()
+    return render(request, "tasks/taskList.html")
+
+
+@login_required
+def task_update(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+
+    # בדיקה למנהל
+    if request.user.role == "admin" and task.myDoner is None :
+        if request.method == "POST":
+            form = TaskForm(request.POST, instance=task)
+            if form.is_valid():
+                form.save()
+                return redirect('task_list')
+        else:
+            form = TaskForm(instance=task)
+        return render(request, 'tasks/crateTask.html', {'form': form})
+    else:
+        return redirect('task_list')  # חסום משתמש שלא מורשה
+
+@login_required
+def task_delete(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    if request.user.role == "admin" and task.myDoner is None:
+        if request.method == "POST":
+            task.delete()
+            return redirect('task_list')
+        return render(request, 'tasks/deleteTask.html', {'task': task})
+    else:
+        return redirect('taskList')
+
+@login_required
+def task_take(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    if task.myDoner is None and request.user.role == "worker":
+        task.myDoner = request.user
+        task.status="Process"
+        task.save()
+    return redirect('tasklist')
+
+@login_required
+def chooseTeam(request):
+    if request.method == "POST":
+        form = ChooseTeamForm(request.POST)
+        if form.is_valid():
+            team = form.cleaned_data['team']
+            role = form.cleaned_data['role']
+            user = request.user
+            user.role = role
+            user.myTeam = team
+            user.save()
+            return redirect("home")
+    else:
+            form = ChooseTeamForm()
+    return render(request, "users/chooseTeam.html", {"form": form})
+
