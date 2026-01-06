@@ -55,7 +55,8 @@ def task_create(request):
     if request.method == "POST":
         form = TaskForm(request.POST)
         if form.is_valid():
-            form.myTeam=request.user.team
+            task = form.save(commit=False)
+            task.myTeam = request.user.team
             form.save()
             return redirect('tasks')
     else:
@@ -64,21 +65,21 @@ def task_create(request):
     return render(request, 'tasks/createTask.html', {'form': form})
 
 
-@login_required
-def Team_enroll(request,team_name):
-    team = get_object_or_404(Team,NAME=team_name)
-    if request.method == "POST":
-        user_id=request.POST.get("username")
-        user = get_object_or_404(User,NAME=user_name)
-        user.team=team
-        user.save()
-        if form.is_valid():
-            enrollment = form.save(commit=False)
-            enrollment.Task = Task
-            enrollment.save()
-    else:
-        form = EnrollmentForm()
-    return render(request, 'Users/enroll_form.html', { "Task": Task,'form': form})
+# @login_required
+# def Team_enroll(request,team_name):
+#     team = get_object_or_404(Team,NAME=team_name)
+#     if request.method == "POST":
+#         user_id=request.POST.get("username")
+#         user = get_object_or_404(User,NAME=user_name)
+#         user.team=team
+#         user.save()
+#         if form.is_valid():
+#             enrollment = form.save(commit=False)
+#             enrollment.Task = Task
+#             enrollment.save()
+#     else:
+#         form = EnrollmentForm()
+#     return render(request, 'Users/enroll_form.html', { "Task": Task,'form': form})
 
 @login_required
 def User_list(request):
@@ -97,20 +98,31 @@ def user_list(request):
     return render(request, 'userList.html', {'User': User})
 
 
-def tasks(request):
+# def tasks(request):
+#
+#     user=request.user
+#     tasks = Task.objects.filter(myTeam=user.team)
+#     status = request.GET.get('status')
+#     if status:
+#         tasks = tasks.filter(status=status)
+#
+#     employee_name = request.GET.get('employee_name')
+#     if employee_name:
+#         tasks = tasks.filter(assigned_to__name__icontains=employee_name)
+#     return render(request, "tasks/taskList.html",{'Tasks': tasks})
 
-    user=request.user
+def tasks(request):
+    user = request.user
     tasks = Task.objects.filter(myTeam=user.team)
+    print("USER TEAM:", request.user.team)
     status = request.GET.get('status')
     if status:
         tasks = tasks.filter(status=status)
 
     employee_name = request.GET.get('employee_name')
     if employee_name:
-        tasks = tasks.filter(assigned_to__name__icontains=employee_name)
-    return render(request, "tasks/taskList.html",{'Tasks': tasks})
-
-
+        tasks = tasks.filter(myDoner__username__icontains=employee_name)
+    return render(request, "tasks/taskList.html", {'Tasks': tasks})
 @login_required
 def task_update(request, pk):
     task = get_object_or_404(Task, pk=pk)
@@ -124,7 +136,7 @@ def task_update(request, pk):
                 return redirect('tasks')
         else:
             form = TaskForm(instance=task)
-        return render(request, 'tasks/crateTask.html', {'form': form})
+        return render(request, 'tasks/createTask.html', {'form': form})
     else:
         return redirect('tasks')  # חסום משתמש שלא מורשה
 
@@ -135,7 +147,7 @@ def task_delete(request, pk):
         if request.method == "POST":
             task.delete()
             return redirect('tasks')
-        return render(request, 'tasks/deleteTask.html', {'task': task})
+        return render(request, 'tasks/deletaTask.html', {'task': task})
     else:
         return redirect('tasks')
 
@@ -146,13 +158,14 @@ def task_take(request, pk):
         task.myDoner = request.user
         task.status="Process"
         task.save()
-    return redirect('tasklist')
+    return redirect('tasks')
 
 @login_required
 def task_finish(request, pk):
     task = get_object_or_404(Task, pk=pk)
     if task.myDoner ==request.user and task.status == "Process":
-        task.status="Process"
+        task.status="Done"
+        task.save()
     return redirect('tasks')
 
 @login_required
@@ -164,7 +177,7 @@ def chooseTeam(request):
             role = form.cleaned_data['role']
             user = request.user
             user.role = role
-            user.myTeam = team
+            user.team = team
             user.save()
             return redirect("home")
     else:

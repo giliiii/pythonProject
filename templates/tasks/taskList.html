@@ -12,9 +12,9 @@
         <label for="status">סטטוס:</label>
         <select name="status" id="status">
             <option value="">--בחר--</option>
-            <option value="open">פתוחה</option>
-            <option value="in_progress">בתהליך</option>
-            <option value="completed">הושלמה</option>
+            <option value="New">פתוחה</option>
+            <option value="Process">בתהליך</option>
+            <option value="Done">הושלמה</option>
         </select>
 
         <label for="employee_name">שם עובד:</label>
@@ -23,7 +23,7 @@
         <button type="submit">סנן</button>
     </form>
 
-    <a href="{% url 'task_create' %}">Add New Task</a>
+    <a href="{% url 'task_create' %}">Add New Task➕</a>
 
     <table border="1">
         <tr>
@@ -35,19 +35,22 @@
         {% for task in Tasks %}
         <tr>
             <td>{{ task.title }}</td>
-            <td>{{ task.description }}</td>
+            <td>{{ task.describe }}</td>
             <td>{{ task.status }}</td>
-            {% if task.myDoner == "Process" and task.myDoner == user%}
-                <a href="{% url 'task_take' task.pk %}">Take Task</a>
-            {% endif %}
             <td>
-                {% if task.myDoner is none %}
+                {% if task.myDoner is None %}
                         {% if user.role == "worker" %}
                             <a href="{% url 'task_take' task.pk %}">Take Task</a>
                         {% elif user.role == "admin" %}
-                            <a href="{% url 'task_update' task.pk %}">Edit</a> |
-                            <a href="{% url 'task_delete' task.pk %}">Delete</a>
+                            <a href="{% url 'task_update' task.pk %}">Edit✏️</a> |
+                            <a href="{% url 'task_delete' task.pk %}">Delete❌</a>
                         {% endif %}
+                {% endif %}
+                {% if task.status == "Process" and task.myDoner == user%}
+                    <a href="{% url 'task_finish' task.pk %}">Finish Task</a>
+                {% endif %}
+                {% if task.status == "Done"%}
+                    <div>complete-✅</div>
                 {% endif %}
             </td>
         </tr>
@@ -57,5 +60,6 @@
         </tr>
         {% endfor %}
     </table>
+    <a href="{% url 'home'%}">Back to home page</a>
 </body>
 </html>

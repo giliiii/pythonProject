@@ -1,59 +1,194 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
     background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
 }
 
-h1 {
+h2 {
+    text-align: center;
+    margin-bottom: 30px;
     color: #333;
 }
 
-form {
-    margin-bottom: 20px;
-    padding: 10px;
-    background: #fff;
-    border: 1px solid #ddd;
+.center-box {
+    background-color: #e0f7fa; /* תכלת עדין */
+    padding: 30px 50px;
+    border-radius: 10px;
+    border: 2px solid #00bcd4; /* מסגרת עדינה תכלת כהה */
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.center-box a {
+    display: inline-block;
+    margin: 10px 0;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #00796b; /* ירוק עדין */
+    font-weight: bold;
     border-radius: 5px;
+    background-color: #b2dfdb; /* ירוק בהיר */
+    transition: all 0.3s ease;
+}
+
+.center-box a:hover {
+    background-color: #80cbc4; /* ירוק קצת כהה יותר */
+    color: white;
+}
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #e0f7fa; /* תכלת עדין לרקע */
+    color: #333;
+}
+
+h1 {
+    color: #00796b; /* ירוק כהה למעלה */
+    text-align: center;
+}
+form {
+    display: inline-block;
+    font-size: 0.75rem; /* קטן מאוד */
+    margin-bottom: 10px;
+    padding: 2px 5px;
+    background: transparent; /* בלי רקע */
+    border: none; /* בלי גבול */
+}
+
+form label {
+    color: #666; /* אפור עדין */
+    margin-right: 3px;
+}
+
+form select,
+form input[type="text"] {
+    font-size: 0.75rem;
+    padding: 2px 4px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    margin-right: 5px;
+}
+
+form button {
+    font-size: 0.75rem;
+    padding: 2px 5px;
+    background-color: #e0f7fa; /* תכלת עדין */
+    color: #00796b;
+    border: 1px solid #00796b;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+form button:hover {
+    background-color: #b2ebf2;
+    color: #004d40;
+}
+
+form {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #b2dfdb; /* תכלת/ירוק עדין */
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #039be5; /* תכלת מודגש */
+    box-shadow: 0 0 5px rgba(3,155,229,0.4);
+    outline: none;
+}
+
+button {
+    background-color: #cddc39; /* צהוב עדין */
+    color: #333;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button:hover {
+    background-color: #dce775; /* צהוב קצת יותר בולט בהובר */
+}
+
+a {
+    text-decoration: none;
+    color: #0288d1; /* תכלת בולט */
+}
+
+a:hover {
+    text-decoration: underline;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    margin-top: 20px;
 }
 
 th, td {
-    padding: 10px;
+    padding: 12px 15px;
     text-align: left;
-    border: 1px solid #ccc;
+    border-bottom: 1px solid #b2dfdb; /* קו עדין */
 }
 
 th {
-    background-color: #f2f2f2;
+    background-color: #b2ebf2; /* תכלת עדין */
+    color: #004d40; /* ירוק כהה */
+}
+
+tr:nth-child(even) {
+    background-color: #e8f5e9; /* ירוק בהיר */
+}
+
+tr:nth-child(odd) {
+    background-color: #fffde7; /* צהוב עדין */
 }
 
 tr:hover {
-    background-color: #f1f1f1;
+    background-color: #b2dfdb; /* ירוק-כחול בהיר */
 }
 
-button {
-    background-color: #5cb85c;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
+/* סטטוס משימות צבעוני אך עדין */
+.status-new {
+    background-color: #81d4fa; /* תכלת */
+    color: #01579b;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
 }
 
-button:hover {
-    background-color: #4cae4c;
+.status-process {
+    background-color: #aed581; /* ירוק בהיר */
+    color: #33691e;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
 }
 
-a {
-    text-decoration: none;
-    color: #007bff;
-}
-
-a:hover {
-    text-decoration: underline;
+.status-done {
+    background-color: #fff176; /* צהוב עדין */
+    color: #f57f17;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
 }
