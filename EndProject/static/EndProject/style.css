@@ -192,3 +192,19 @@ tr:hover {
     border-radius: 5px;
     font-weight: bold;
 }
+/* עיצוב כל השגיאות */
+ul.errorlist {
+    color: red;
+    font-weight: bold;
+    padding-left: 0;
+    list-style-type: none;
+}
+
+ul.errorlist li {
+    margin-bottom: 5px;
+}
+
+/* אם יש שגיאה בשדה טופס, ניתן להוסיף לו גבול אדום */
+input.error, select.error, textarea.error {
+    border: 2px solid red;
+}

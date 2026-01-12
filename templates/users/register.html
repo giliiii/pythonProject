@@ -5,12 +5,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+        .errorlist {
+            color: red;
+            font-weight: bold;
+            padding-left: 0;
+            list-style-type: none;
+        }
+    </style>
 </head>
 <body>
     <h1>register</h1>
     <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
+            <ul class="errorlist">
+                {{ form.errors }}
+            </ul>
             <button type="submit">register</button>
     </form>
 </body>

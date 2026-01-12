@@ -23,7 +23,9 @@
         <button type="submit">סנן</button>
     </form>
 
-    <a href="{% url 'task_create' %}">Add New Task➕</a>
+    {% if user.role == "admin" %}
+        <a href="{% url 'task_create' %}">Add New Task➕</a>
+    {% endif %}
 
     <table border="1">
         <tr>

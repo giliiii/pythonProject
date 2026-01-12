@@ -43,10 +43,10 @@ class TaskForm(forms.ModelForm):
             "describe": "describe",
             "deadline": "deadline",
         }
-        help_texts = {
-            "f_name": "Should be valid email adress",
-            "l_name": "Should contains letters and numbers",
-        }
+        # help_texts = {
+        #     "f_name": "Should be valid email adress",
+        #     "l_name": "Should contains letters and numbers",
+        # }
 
 
 class TeamForm(forms.ModelForm):
@@ -74,7 +74,18 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ['username', 'password1','password2']
-
+    # def clean_username(self):
+    #     username = self.cleaned_data["username"]
+    #     if not username:
+    #         raise forms.ValidationError("username is required")
+    #     if User.objects.filter(username=username).exists():
+    #         raise forms.ValidationError("username exists")
+    #     return username
+    # def clean_password(self):
+    #     password = self.cleaned_data["password"]
+    #     if not password:
+    #         raise forms.ValidationError("password is required")
+    #     return password
 
 class CustomAuthenticationForm(AuthenticationForm):
     class Meta:
